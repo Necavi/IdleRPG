@@ -1,4 +1,4 @@
-Serva
+IdleRPG
 =====
 
-A plugin based IRC bot
+A plugin based IdleRPG bot, using the Serva framework
