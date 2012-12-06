@@ -10,9 +10,12 @@ class main:
         self.b = biblib.bot()
         self.nick = constants.nick
         self.b.initconnection(constants.ircinfo,self.nick)
+        logpath = os.getcwd() + "/logs/"
+        if not os.path.isdir(logpath):
+            os.mkdir(logpath)
         self.t = Timer(5.0,self.Flush)
         self.t.start()
-        self.errorlog = open(os.getcwd() + "/logs/bot.txt","a")
+        self.errorlog = open(logpath + "bot.txt","a")
         self.b.ircevents.Connected += self.Connected
         self.mysqlmanager = mysqlmanager.mysqlmanager(self)
         self.eventmanager = eventmanager.eventmanager(self)

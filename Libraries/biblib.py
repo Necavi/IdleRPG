@@ -102,14 +102,15 @@ class bot:
 
     def SendMgr(self):
         while True:
-            if(len(self.messagequeue) > 0):
+            if len(self.messagequeue) > 0:
                 message = self.messagequeue.pop()
-                if(len(message) > 510):
+                if len(message) > 510:
                     split = message.split(' ')
                     message2 = "{} {} {}".format(split[0],split[1],message[:510])
                     message = message[510:]
                     self.messagequeue.appendleft(message2)
                 self.Print(message)
+                #noinspection PyBroadException
                 try:
                     self.tsocket.send(bytes(message+"\r\n",'utf-8'))
                 except:
@@ -127,37 +128,36 @@ class bot:
     def ParseMessage(self, message):
         self.ircevents.Raw(message)
         command = message.split(' ')
-        if(command[0] == 'PING'):
+        if command[0] == 'PING':
             message = 'PONG' + ' ' + command[1]
             self.SendMsg(message)
-        elif(command[1] == 'PRIVMSG' or command[1]=='NOTICE'):
-            if(command[3].lstrip(':').startswith('\x01') and command[3].lstrip(":").endswith('\x01')):
+        elif command[1] == 'PRIVMSG' or command[1]=='NOTICE':
+            if command[3].lstrip(':').startswith('\x01') and command[3].lstrip(":").endswith('\x01'):
                 self.ircevents.CTCP(command[2],self.ParseName(command[0]),command[3].lstrip(":").strip('\x01'),' '.join(command[4:]))
             else:
                 message = command[3].lstrip(':')
                 for i in range(4,len(command)):
                     message = message + ' ' + command[i]
-                nick = self.ParseName(command[0])
                 self.ircevents.Msg(command[0], message)
                 nick = self.ParseName(command[0])
-                if(command[2].startswith("#")):
+                if command[2].startswith("#"):
                     self.ircevents.ChanMsg(command[2], nick, message)
-                elif(command[2] == self.nick):
+                elif command[2] == self.nick:
                     self.ircevents.PrivMsg(nick, message)
-        elif(command[1].isnumeric()):
+        elif command[1].isnumeric():
             self.ircevents.Numeric(int(command[1])," ".join(command[2:]))
-            if(command[1] == '001'):
+            if command[1] == '001':
                 self.ircevents.Connected()
-        elif(command[1] == 'JOIN'):
+        elif command[1] == 'JOIN':
             nick = self.StripTags(self.ParseName(command[0]))
             self.ircevents.Join(command[2], nick)
-        elif(command[1] == 'PART'):
+        elif command[1] == 'PART':
             nick = self.ParseName(command[0])
             self.ircevents.Part(command[2], nick)
-        elif(command[1] == 'QUIT'):
+        elif command[1] == 'QUIT':
             nick = self.ParseName(command[0])
             self.ircevents.Quit(command[2], nick)
-        elif(command[1] == 'NICK'):
+        elif command[1] == 'NICK':
             self.ircevents.Nick(self.ParseName(command[0]), self.ParseName(command[2]))
             
     def StripTags(self, name):
@@ -179,7 +179,7 @@ class bot:
                 self.Print(data)
                 self.ParseMessage(data)
             except:
-                PrintErr(traceback.print_exc())
+                self.PrintErr(traceback.print_exc())
             time.sleep(0.01)
 
     def Identify(self, password):
@@ -190,15 +190,15 @@ class bot:
             
     def initconnection(self, connection, nick, useSSL = False, identify = None):
         self.connection = connection
-        self.tsocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        if(useSSL):
+        self.tsocket = socket.socket()
+        if useSSL:
             try:
                 import ssl
             except ImportError:
                 self.Print("Unable to initiated SSL for this server")
             else:
                 self.tsocket = ssl.wrap_socket(self.tsocket)
-        if(identify != None):
+        if identify:
             self.identify = identify
             self.ircevents.Connected += self.nickserv
         self.tsocket.connect(self.connection)

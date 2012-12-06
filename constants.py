@@ -1,8 +1,8 @@
-nick = "serva2"
-channels = ["#serva"]
-ircinfo = ("irc.esper.net",6667)
+nick = "Idle-Test"
+channels = ["#idlerpg-test"]
+ircinfo = ("irc.esper.net", 6667)
 mysqlhost = "localhost"
 ## Choices are: chanmsg, privmsg, or both
-commandtype = "both"
-kinky = True
+commandtype = "privmsg"
+kinky = False
 commandtag = "!"
