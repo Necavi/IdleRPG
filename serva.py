@@ -22,15 +22,15 @@ class main:
         self.commandmanager = commandmanager.commandmanager(self)
         self.usermanager = usermanager.usermanager(self)
         self.pluginmanager = pluginmanager.pluginmanager(self)
-        
+
     def Connected(self):
         self.b.Print("Successfully loaded {} plugins!".format(self.pluginmanager.LoadPlugins()))
-        
+
     def LogError(self):
         error = traceback.format_exc()
         self.b.PrintErr(error)
         self.errorlog.write(error)
-        
+
     def Flush(self):
         self.errorlog.flush()
         self.t = Timer(5.0, self.Flush)
